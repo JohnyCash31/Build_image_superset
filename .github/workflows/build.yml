@@ -1,0 +1,25 @@
+name: Build Superset Airgap Image
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t superset-airgap:latest .
+
+      - name: Save image
+        run: docker save superset-airgap:latest | gzip > superset-airgap.tar.gz
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: superset-image
+          path: superset-airgap.tar.gz
