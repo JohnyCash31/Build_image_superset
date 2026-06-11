@@ -2,16 +2,25 @@ FROM apache/superset:6.1.0
 
 USER root
 
-RUN echo "=== PYTHON ==="
-RUN which python || true
-RUN python --version || true
+RUN apt-get update && apt-get install -y \
+    gcc \
+    libldap2-dev \
+    libsasl2-dev \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN echo "=== UV ==="
-RUN which uv || true
-RUN uv --version || true
+RUN . /app/.venv/bin/activate && \
+    uv pip install \
+      psycopg2-binary \
+      pymssql \
+      Authlib \
+      openpyxl \
+      Pillow \
+      playwright \
+      python-ldap && \
+    playwright install-deps && \
+    PLAYWRIGHT_BROWSERS_PATH=/usr/local/share/playwright-browsers playwright install chromium
 
-RUN echo "=== VENV ==="
-RUN ls -la /app/.venv/bin || true
+USER superset
 
-RUN echo "=== ALL UV ==="
-RUN find / -name uv 2>/dev/null | head -20
+CMD ["/app/docker/entrypoints/run-server.sh"]
