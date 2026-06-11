@@ -16,7 +16,7 @@ jobs:
         run: docker build -t superset-airgap:latest .
 
       - name: Save image
-        run: docker save superset-airgap:latest | gzip > superset-airgap.tar.gz
+        run: docker save localhost/secmon/superset:6.1.0 | gzip > superset-airgap.tar.gz
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
