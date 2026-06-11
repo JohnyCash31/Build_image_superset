@@ -9,8 +9,7 @@ RUN . /app/.venv/bin/activate && \
       Authlib \
       openpyxl \
       Pillow \
-      playwright \
-      python-ldap && \
+      playwright && \
     playwright install-deps && \
     PLAYWRIGHT_BROWSERS_PATH=/usr/local/share/playwright-browsers playwright install chromium
 
