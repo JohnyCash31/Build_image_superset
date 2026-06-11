@@ -2,13 +2,6 @@ FROM apache/superset:6.1.0
 
 USER root
 
-RUN apt-get update && apt-get install -y \
-    gcc \
-    libldap2-dev \
-    libsasl2-dev \
-    libssl-dev \
-    && rm -rf /var/lib/apt/lists/*
-
 RUN . /app/.venv/bin/activate && \
     uv pip install \
       psycopg2-binary \
