@@ -2,6 +2,7 @@ FROM apache/superset:6.1.0
 
 USER root
 
+# Dépendances système nécessaires à python-ldap
 RUN apt-get update && apt-get install -y \
     gcc \
     libldap2-dev \
@@ -9,16 +10,17 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN pip install \
+# Installation des dépendances Python
+RUN python -m pip install --no-cache-dir \
     psycopg2-binary \
     pymssql \
     Authlib \
     openpyxl \
     Pillow \
-    playwright \
-    python-ldap
+    python-ldap \
+    playwright
 
-RUN playwright install-deps
+# Installation Chromium pour Playwright
 RUN playwright install chromium
 
 USER superset
