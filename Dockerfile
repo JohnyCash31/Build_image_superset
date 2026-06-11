@@ -11,6 +11,7 @@ RUN . /app/.venv/bin/activate && \
       Authlib \
       openpyxl \
       Pillow \
+      Python-ldap \
       playwright && \
     playwright install-deps && \
     playwright install chromium
