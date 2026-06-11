@@ -2,27 +2,16 @@ FROM apache/superset:6.1.0
 
 USER root
 
-# Dépendances système nécessaires à python-ldap
-RUN apt-get update && apt-get install -y \
-    gcc \
-    libldap2-dev \
-    libsasl2-dev \
-    libssl-dev \
-    && rm -rf /var/lib/apt/lists/*
+RUN echo "=== PYTHON ==="
+RUN which python || true
+RUN python --version || true
 
-# Installation des dépendances Python
-RUN python -m pip install --no-cache-dir \
-    psycopg2-binary \
-    pymssql \
-    Authlib \
-    openpyxl \
-    Pillow \
-    python-ldap \
-    playwright
+RUN echo "=== UV ==="
+RUN which uv || true
+RUN uv --version || true
 
-# Installation Chromium pour Playwright
-RUN playwright install chromium
+RUN echo "=== VENV ==="
+RUN ls -la /app/.venv/bin || true
 
-USER superset
-
-CMD ["/app/docker/entrypoints/run-server.sh"]
+RUN echo "=== ALL UV ==="
+RUN find / -name uv 2>/dev/null | head -20
