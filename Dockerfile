@@ -1,10 +1,7 @@
-FROM apache/superset:master
+FROM apache/superset:6.1
 
 USER root
 
-ENV PLAYWRIGHT_BROWSERS_PATH=/usr/local/share/playwright-browsers
-
-# Dépendances système nécessaires pour python-ldap
 RUN apt-get update && apt-get install -y \
     gcc \
     libldap2-dev \
@@ -12,17 +9,17 @@ RUN apt-get update && apt-get install -y \
     libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
-RUN . /app/.venv/bin/activate && \
-    uv pip install \
-      psycopg2-binary \
-      pymssql \
-      Authlib \
-      openpyxl \
-      Pillow \
-      playwright \
-      python-ldap && \
-    playwright install-deps && \
-    playwright install chromium
+RUN pip install \
+    psycopg2-binary \
+    pymssql \
+    Authlib \
+    openpyxl \
+    Pillow \
+    playwright \
+    python-ldap
+
+RUN playwright install-deps
+RUN playwright install chromium
 
 USER superset
 
