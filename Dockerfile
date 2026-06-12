@@ -4,10 +4,6 @@ USER root
 
 RUN . /app/.venv/bin/activate && \
     uv pip install \
-      psycopg2-binary \
-      pymssql \
-      Authlib \
-      openpyxl \
       Pillow \
       playwright && \
     playwright install-deps && \
