@@ -13,6 +13,12 @@ RUN pip install \
 
 RUN playwright install-deps && \
     PLAYWRIGHT_BROWSERS_PATH=/usr/local/share/playwright-browsers playwright install chromium
+RUN which python && \
+    which pip && \
+    python --version && \
+    pip --version
+RUN pip show ldap3
+RUN pip show playwright
 
 USER superset
 
