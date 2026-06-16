@@ -1,58 +1,35 @@
-FROM apache/superset:6.1.0
+name: Build Superset Airgap Image
 
-USER root
+on:
+  workflow_dispatch:
 
-# ------------------------------------------------------------
-# Dépendances système nécessaires aux libs Python
-# ------------------------------------------------------------
-RUN apt-get update && \
-    apt-get install -y \
-        gcc \
-        g++ \
-        build-essential \
-        python3-dev \
-        libldap2-dev \
-        libsasl2-dev \
-        libssl-dev \
-        libffi-dev \
-        curl \
-        wget && \
-    rm -rf /var/lib/apt/lists/*
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-# ------------------------------------------------------------
-# Installation Python (IMPORTANT : via python -m pip)
-# ------------------------------------------------------------
-RUN python -m pip install --no-cache-dir --upgrade pip setuptools wheel
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-RUN python -m pip install --no-cache-dir \
-    python-ldap \
-    psycopg2-binary \
-    pymssql \
-    Authlib \
-    openpyxl \
-    Pillow \
-    playwright
+      - name: Build Docker image
+        run: |
+          docker build \
+            -t localhost/secmon/superset:6.1.0-1 \
+            .
 
-# ------------------------------------------------------------
-# Playwright setup (browsers + deps)
-# ------------------------------------------------------------
-RUN python -m playwright install-deps
+      - name: Verify image
+        run: |
+          docker images
 
-ENV PLAYWRIGHT_BROWSERS_PATH=/usr/local/share/playwright-browsers
+      - name: Export image
+        run: |
+          docker save \
+            localhost/secmon/superset:6.1.0-1 \
+            -o secmon_superset-6.1.tar
 
-RUN python -m playwright install firefox
-
-# ------------------------------------------------------------
-# Permissions (important pour Superset runtime)
-# ------------------------------------------------------------
-RUN chown -R superset:superset /usr/local/share/playwright-browsers || true
-
-# ------------------------------------------------------------
-# Retour user non-root (obligatoire Superset)
-# ------------------------------------------------------------
-USER superset
-
-# ------------------------------------------------------------
-# Lancement Superset
-# ------------------------------------------------------------
-CMD ["/app/docker/entrypoints/run-server.sh"]
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: secmon_superset-6.1
+          path: secmon_superset-6.1.tar
+          retention-days: 7
