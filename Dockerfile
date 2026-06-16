@@ -3,7 +3,7 @@ FROM apache/superset:6.1.0
 USER root
 
 RUN pip install \
-    ldap3 \
+    python-ldap \
     psycopg2-binary \
     pymssql \
     Authlib \
@@ -12,13 +12,8 @@ RUN pip install \
     playwright
 
 RUN playwright install-deps && \
-    PLAYWRIGHT_BROWSERS_PATH=/usr/local/share/playwright-browsers playwright install chromium
-RUN which python && \
-    which pip && \
-    python --version && \
-    pip --version
-RUN pip show ldap3
-RUN pip show playwright
+    PLAYWRIGHT_BROWSERS_PATH=/usr/local/share/playwright-browsers \
+    playwright install firefox
 
 USER superset
 
