@@ -3,7 +3,7 @@ FROM apache/superset:6.1.0
 USER root
 
 # ------------------------------------------------------------
-# Dépendances système nécessaires aux libs Python
+# OS deps
 # ------------------------------------------------------------
 RUN apt-get update && \
     apt-get install -y \
@@ -20,11 +20,22 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # ------------------------------------------------------------
-# Installation Python (IMPORTANT : via python -m pip)
+# IMPORTANT : venv Superset
 # ------------------------------------------------------------
-RUN python -m pip install --no-cache-dir --upgrade pip setuptools wheel
+ENV VENV_PY=/app/.venv/bin/python
 
-RUN python -m pip install --no-cache-dir \
+# ------------------------------------------------------------
+# Bootstrap pip (FIX TON ERREUR)
+# ------------------------------------------------------------
+RUN $VENV_PY -m ensurepip --upgrade || true
+
+RUN $VENV_PY -m pip install --no-cache-dir --upgrade \
+    pip setuptools wheel
+
+# ------------------------------------------------------------
+# Python libs
+# ------------------------------------------------------------
+RUN $VENV_PY -m pip install --no-cache-dir \
     python-ldap \
     psycopg2-binary \
     pymssql \
@@ -34,25 +45,19 @@ RUN python -m pip install --no-cache-dir \
     playwright
 
 # ------------------------------------------------------------
-# Playwright setup (browsers + deps)
+# Playwright
 # ------------------------------------------------------------
-RUN python -m playwright install-deps
+RUN $VENV_PY -m playwright install-deps
 
 ENV PLAYWRIGHT_BROWSERS_PATH=/usr/local/share/playwright-browsers
 
-RUN python -m playwright install firefox
+RUN $VENV_PY -m playwright install firefox
 
 # ------------------------------------------------------------
-# Permissions (important pour Superset runtime)
+# Permissions
 # ------------------------------------------------------------
 RUN chown -R superset:superset /usr/local/share/playwright-browsers || true
 
-# ------------------------------------------------------------
-# Retour user non-root (obligatoire Superset)
-# ------------------------------------------------------------
 USER superset
 
-# ------------------------------------------------------------
-# Lancement Superset
-# ------------------------------------------------------------
 CMD ["/app/docker/entrypoints/run-server.sh"]
