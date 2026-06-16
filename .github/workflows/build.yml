@@ -33,4 +33,3 @@ steps:
       name: secmon_superset-6.1
       path: secmon_superset-6.1.tar
       retention-days: 7
-```
